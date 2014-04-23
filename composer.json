@@ -1,0 +1,23 @@
+{
+    "name": "task/archive",
+    "description": "Archive plugin for Task using Zippy",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mike Fisher",
+            "email": "mike@mbfisher.com"
+        }
+    ],
+    "require": {
+        "task/plugin": "1.0.0",
+        "task/filesystem": "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Task\\Plugin\\": "src/"
+        }
+    }
+}
