@@ -9,8 +9,8 @@
         }
     ],
     "require": {
-        "task/plugin": "1.0.0",
-        "task/filesystem": "dev-master"
+        "task/plugin": "~1.0",
+        "task/filesystem": "~0.1"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.0"
