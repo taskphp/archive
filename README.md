@@ -5,6 +5,10 @@ Example
 =======
 
 ```php
+use Task\Plugin\FilesystemPlugin;
+use Task\Plugin\ArchivePlugin;
+use Task\Plugin\Archive\Archive;
+
 $project->inject(function ($container) {
     $container['fs'] = new FilesystemPlugin;
     $container['archive'] = new ArchivePlugin;
