@@ -3,6 +3,7 @@
 namespace Task\Plugin\Archive;
 
 use Task\Plugin\FilesystemPlugin;
+use Task\Plugin\Filesystem\File;
 
 class ArchiveTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,5 +29,23 @@ class ArchiveTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['bar', 'baz', 'foo'], $output);
 
         `rm -rf $dir $tmp`;
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @dataProvider writeThrowsOnBadDataProvider
+     */
+    public function testWriteThrowsOnBadData($data)
+    {
+        $fs = new FilesystemPlugin;
+        $archive = new Archive($fs, Archive::TAR, Archive::GZ);
+        $archive->write($data);
+    }
+    public function writeThrowsOnBadDataProvider()
+    {
+        return [
+            ['foo'],
+            [new File('test')]
+        ];
     }
 }

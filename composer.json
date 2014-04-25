@@ -9,11 +9,12 @@
         }
     ],
     "require": {
-        "task/plugin": "~1.0",
+        "task/plugin": "~1.1",
         "task/filesystem": "~0.1"
     },
     "require-dev": {
-        "phpunit/phpunit": "~4.0"
+        "task/task": "~0.1",
+        "task/phpunit": "~0.1"
     },
     "autoload": {
         "psr-4": {
