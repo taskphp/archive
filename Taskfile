@@ -12,7 +12,6 @@ $project->inject(function ($container) {
 
 $project->addTask('test', ['phpunit', function ($phpunit) {
     $phpunit->getCommand()
-        ->setConfiguration($this->getProperty('config', 'phpunit.xml'))
         ->pipe($this->getOutput());
 }]);
 

@@ -9,6 +9,7 @@ use Task\Plugin\Filesystem\FilesystemIterator;
 class Archive implements WritableInterface
 {
     const TAR = 'tar';
+    const ZIP = 'zip';
 
     const GZ = \Phar::GZ;
     const BZ2 = \Phar::BZ2;
@@ -23,11 +24,15 @@ class Archive implements WritableInterface
     protected $compression;
     protected $tmp;
 
-    public function __construct(FilesystemPlugin $fs, $type, $compression = null)
+    public function __construct($type, $compression = null, FilesystemPlugin $fs = null)
     {
-        $this->fs = $fs;
-        $this->type = $type;
-        $this->compression = $compression;
+        # Throws
+        if ($this->isSupported($type, $compression)) {
+            $this->type = $type;
+            $this->compression = $compression;
+        }
+
+        $this->fs = $fs ?: new FilesystemPlugin;
     }
 
     public function write($data)
@@ -57,5 +62,22 @@ class Archive implements WritableInterface
         if ($this->tmp) {
             $this->fs->remove($this->tmp->getPathname());
         }
+    }
+
+    public static function isSupported($type, $compression = null)
+    {
+        if (!in_array($type, [static::TAR, static::ZIP])) {
+            throw new \InvalidArgumentException("Unsupported type [$type]");
+        }
+
+        if (!is_null($compression) && !in_array($compression, [static::GZ, static::BZ2])) {
+            throw new \InvalidArgumentException("Unsupported compression stream [$compression]");
+        }
+
+        if ($type === static::ZIP && !is_null($compression)) {
+            throw new \InvalidArgumentException("Can't compress a ZIP archive");
+        }
+
+        return true;
     }
 }

@@ -1,6 +1,9 @@
 task/archive
 ============
 
+[![Build Status](https://travis-ci.org/taskphp/archive.svg?branch=master)](https://travis-ci.org/taskphp/archive)
+[![Coverage Status](https://coveralls.io/repos/taskphp/archive/badge.png?branch=master)](https://coveralls.io/r/taskphp/archive?branch=master)
+
 Example
 =======
 
