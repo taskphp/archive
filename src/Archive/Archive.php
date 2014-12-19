@@ -5,6 +5,7 @@ namespace Task\Plugin\Archive;
 use Task\Plugin\Stream\WritableInterface;
 use Task\Plugin\FilesystemPlugin;
 use Task\Plugin\Filesystem\FilesystemIterator;
+use Iterator;
 
 class Archive implements WritableInterface
 {
@@ -37,24 +38,41 @@ class Archive implements WritableInterface
 
     public function write($data)
     {
-        $tempnam = sys_get_temp_dir().'/'.'archive'.time().'.'.$this->type;
-
-        if ($data instanceof FilesystemIterator) {
-            $phar = new \PharData($tempnam);
-            $this->tmp = $this->fs->open($tempnam);
-
-            $phar->buildFromIterator($data, $data->getPath());
-
-            if ($this->compression) {
-                $phar = $phar->compress($this->compression);
-                $this->fs->remove($tempnam);
-                $this->tmp = $this->fs->open($tempnam.'.'.$this->extensions[$this->compression]);
-            }
-
-            return $this->tmp;
+        if (is_array($data)) {
+            $data = new \ArrayIterator($data);
+        } elseif ($data instanceof \SplFileInfo) {
+            $data = new \ArrayIterator([$data]);
+        } elseif (!$data instanceof Iterator) {
+            $type = is_object($data) ? get_class($data) : gettype($data);
+            throw new \InvalidArgumentException("Archive::write expects an Iterator, got $type");
         }
 
-        throw new \InvalidArgumentException("Unknown data type");
+        $tempnam = sys_get_temp_dir().'/'.'archive'.time().'.'.$this->type;
+
+        $phar = new \PharData($tempnam);
+        $this->tmp = $this->fs->open($tempnam);
+
+        $baseDirectory = null;
+
+        if ($data instanceof Finder) {
+            $baseDirectory = $data->getBaseDirectory();
+        } elseif ($data instanceof FilesystemIterator) {
+            $baseDirectory = $data->getPath();
+        }
+
+        if (!$baseDirectory) {
+            $baseDirectory = getcwd();
+        }
+
+        $phar->buildFromIterator($data, $baseDirectory);
+
+        if ($this->compression) {
+            $phar = $phar->compress($this->compression);
+            $this->fs->remove($tempnam);
+            $this->tmp = $this->fs->open($tempnam.'.'.$this->extensions[$this->compression]);
+        }
+
+        return $this->tmp;
     }
 
     public function __destruct()

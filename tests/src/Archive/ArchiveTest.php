@@ -48,9 +48,16 @@ class ArchiveTest extends \PHPUnit_Framework_TestCase
             ->pipe($archive)
             ->pipe($fs->open($tmp));
 
-        exec("unzip -l $tmp | tail -5 | head -3 | sed 's/.*\s\([^\s]\+\)$/\\1/'", $output);
-        sort($output);
-        $this->assertEquals(['bar', 'baz', 'foo'], $output);
+        $zip = new \ZipArchive;
+        $zip->open($tmp);
+
+        $files = [];
+        foreach (range(0, $zip->numFiles-1) as $i) {
+            $stat = $zip->statIndex($i);
+            $files[] = $stat['name'];
+        }
+
+        $this->assertEquals(['bar', 'baz', 'foo'], $files);
 
         `rm -rf $dir $tmp`;
     }
@@ -67,8 +74,7 @@ class ArchiveTest extends \PHPUnit_Framework_TestCase
     public function writeThrowsOnBadDataProvider()
     {
         return [
-            ['foo'],
-            [new File('test')]
+            ['foo']
         ];
     }
 
