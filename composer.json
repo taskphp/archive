@@ -10,7 +10,7 @@
     ],
     "require": {
         "task/plugin": "~1.1",
-        "task/filesystem": "~0.1"
+        "task/filesystem": "dev-feature/finder@dev"
     },
     "require-dev": {
         "ext-zip": "*",
