@@ -85,11 +85,15 @@ class ArchiveTest extends \PHPUnit_Framework_TestCase
     public function makeIteratorProvider()
     {
         $file = new \SplFileInfo('/tmp');
+        $finder = new \Task\Plugin\Filesystem\Finder;
+        $baseFinder = new \Symfony\Component\Finder\Finder;
 
         return [
             ['foo', true],
             [['foo'], false, new \ArrayIterator(['foo'])],
-            [$file, false, new \ArrayIterator([$file])]
+            [$file, false, new \ArrayIterator([$file])],
+            [$finder, false, $finder],
+            [$baseFinder, false, $baseFinder],
         ];
     }
 
