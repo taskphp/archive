@@ -6,6 +6,7 @@ use Task\Plugin\Stream\WritableInterface;
 use Task\Plugin\FilesystemPlugin;
 use Task\Plugin\Filesystem\FilesystemIterator;
 use Iterator;
+use IteratorAggregate;
 
 class Archive implements WritableInterface
 {
@@ -42,7 +43,7 @@ class Archive implements WritableInterface
             $data = new \ArrayIterator($data);
         } elseif ($data instanceof \SplFileInfo) {
             $data = new \ArrayIterator([$data]);
-        } elseif (!$data instanceof Iterator) {
+        } elseif (!$data instanceof Iterator && !$data instanceof IteratorAggregate) {
             $type = is_object($data) ? get_class($data) : gettype($data);
             throw new \InvalidArgumentException("Archive::write expects an Iterator, got $type");
         }
