@@ -39,14 +39,7 @@ class Archive implements WritableInterface
 
     public function write($data)
     {
-        if (is_array($data)) {
-            $data = new \ArrayIterator($data);
-        } elseif ($data instanceof \SplFileInfo) {
-            $data = new \ArrayIterator([$data]);
-        } elseif (!$data instanceof Iterator && !$data instanceof IteratorAggregate) {
-            $type = is_object($data) ? get_class($data) : gettype($data);
-            throw new \InvalidArgumentException("Archive::write expects an Iterator, got $type");
-        }
+        $files = $this->makeIterator($data);
 
         $tempnam = sys_get_temp_dir().'/'.'archive'.time().'.'.$this->type;
 
@@ -55,17 +48,17 @@ class Archive implements WritableInterface
 
         $baseDirectory = null;
 
-        if ($data instanceof Finder) {
-            $baseDirectory = $data->getBaseDirectory();
-        } elseif ($data instanceof FilesystemIterator) {
-            $baseDirectory = $data->getPath();
+        if ($files instanceof Finder) {
+            $baseDirectory = $files->getBaseDirectory();
+        } elseif ($files instanceof FilesystemIterator) {
+            $baseDirectory = $files->getPath();
         }
 
         if (!$baseDirectory) {
             $baseDirectory = getcwd();
         }
 
-        $phar->buildFromIterator($data, $baseDirectory);
+        $phar->buildFromIterator($files, $baseDirectory);
 
         if ($this->compression) {
             $phar = $phar->compress($this->compression);
@@ -74,6 +67,20 @@ class Archive implements WritableInterface
         }
 
         return $this->tmp;
+    }
+
+    public function makeIterator($data)
+    {
+        if (is_array($data)) {
+            return new \ArrayIterator($data);
+        } elseif ($data instanceof \SplFileInfo) {
+            return new \ArrayIterator([$data]);
+        } elseif (!$data instanceof Iterator && !$data instanceof IteratorAggregate) {
+            $type = is_object($data) ? get_class($data) : gettype($data);
+            throw new \InvalidArgumentException("Archive::write expects an Iterator, got $type");
+        }
+
+        return $data;
     }
 
     public function __destruct()

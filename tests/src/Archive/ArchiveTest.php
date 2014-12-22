@@ -63,18 +63,33 @@ class ArchiveTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
-     * @dataProvider writeThrowsOnBadDataProvider
+     * @dataProvider makeIteratorProvider
      */
-    public function testWriteThrowsOnBadData($data)
+    public function testMakeIterator($data, $throws, $iterator = null)
     {
-        $archive = new Archive(Archive::TAR, Archive::GZ);
-        $archive->write($data);
+        $archive = new Archive(Archive::TAR);
+
+        $ex = null;
+        try {
+            $archive->makeIterator($data);
+        } catch (\InvalidArgumentException $__ex__) {
+            $ex = $__ex__;
+        }
+
+        if ($throws) {
+            $this->assertNotNull($ex);
+        } else {
+            $this->assertNull($ex);
+        }
     }
-    public function writeThrowsOnBadDataProvider()
+    public function makeIteratorProvider()
     {
+        $file = new \SplFileInfo('/tmp');
+
         return [
-            ['foo']
+            ['foo', true],
+            [['foo'], false, new \ArrayIterator(['foo'])],
+            [$file, false, new \ArrayIterator([$file])]
         ];
     }
 
